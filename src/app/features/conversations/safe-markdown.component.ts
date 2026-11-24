@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { NotificationService } from '../../core/errors/notification.service';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { parseSafeMarkdown } from '../../shared/utils/safe-markdown';
 
 @Component({
   selector: 'app-safe-markdown',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IconComponent],
   template: `
     <div class="md-root">
       @for (block of blocks(); track $index) {
@@ -23,7 +25,8 @@ import { parseSafeMarkdown } from '../../shared/utils/safe-markdown';
               <div class="code-header">
                 <span class="cj-mono code-lang">{{ block.language }}</span>
                 <button type="button" class="copy-btn" (click)="copyCode(block.code)">
-                  Copiar
+                  <app-icon name="copy" [size]="13" />
+                  <span>Copiar</span>
                 </button>
               </div>
               <pre class="code-pre"><code>{{ block.code }}</code></pre>
@@ -120,6 +123,9 @@ import { parseSafeMarkdown } from '../../shared/utils/safe-markdown';
     }
 
     .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
       border: 1px solid rgba(148, 163, 184, 0.35);
       background: transparent;
       color: #e2e8f0;

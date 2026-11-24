@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { StatusBadgeComponent } from '../../shared/ui/status-badge.component';
 import { ConversationsFacade } from './conversations.facade';
 import { SafeMarkdownComponent } from './safe-markdown.component';
@@ -8,14 +9,15 @@ import { SafeMarkdownComponent } from './safe-markdown.component';
   selector: 'app-chat',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ConversationsFacade],
-  imports: [FormsModule, SafeMarkdownComponent, StatusBadgeComponent],
+  imports: [FormsModule, SafeMarkdownComponent, StatusBadgeComponent, IconComponent],
   template: `
     <div class="chat-layout">
       <aside class="conv-panel cj-card" [class.mobile-open]="mobileListOpen()">
         <div class="conv-header">
           <strong>Conversas</strong>
           <button type="button" class="cj-btn cj-btn-primary btn-sm" (click)="newChat()">
-            + Nova
+            <app-icon name="plus" [size]="14" />
+            <span>Nova</span>
           </button>
         </div>
 
@@ -46,7 +48,8 @@ import { SafeMarkdownComponent } from './safe-markdown.component';
             class="cj-btn btn-sm mobile-toggle"
             (click)="mobileListOpen.set(!mobileListOpen())"
           >
-            ☰ Conversas ({{ facade.conversations().length }})
+            <app-icon name="menu" [size]="15" />
+            <span>Conversas ({{ facade.conversations().length }})</span>
           </button>
           <div class="stage-title">
             {{ facade.activeConversation()?.title || 'Nova conversa CreatingJ' }}
@@ -130,7 +133,8 @@ import { SafeMarkdownComponent } from './safe-markdown.component';
                 class="cj-btn cj-btn-danger"
                 (click)="facade.stopGeneration(true)"
               >
-                ■ Parar
+                <app-icon name="stop" [size]="14" />
+                <span>Parar</span>
               </button>
             } @else {
               <button
@@ -138,7 +142,8 @@ import { SafeMarkdownComponent } from './safe-markdown.component';
                 class="cj-btn cj-btn-primary"
                 [disabled]="!draft.trim()"
               >
-                Enviar
+                <app-icon name="send" [size]="14" />
+                <span>Enviar</span>
               </button>
             }
           </div>

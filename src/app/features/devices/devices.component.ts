@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DeviceSummaryResponse } from '../../core/api/api-v1.models';
 import { NotificationService } from '../../core/errors/notification.service';
 import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { BadgeTone, StatusBadgeComponent } from '../../shared/ui/status-badge.component';
 import { DevicesFacade } from './devices.facade';
 
@@ -11,7 +12,7 @@ import { DevicesFacade } from './devices.facade';
   selector: 'app-devices',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DevicesFacade],
-  imports: [ReactiveFormsModule, DatePipe, StatusBadgeComponent, EmptyStateComponent],
+  imports: [ReactiveFormsModule, DatePipe, StatusBadgeComponent, EmptyStateComponent, IconComponent],
   template: `
     <div class="cj-page-header">
       <div>
@@ -21,7 +22,8 @@ import { DevicesFacade } from './devices.facade';
         </p>
       </div>
       <button type="button" class="cj-btn" (click)="facade.load()" [disabled]="facade.loading()">
-        Atualizar
+        <app-icon name="refresh" [size]="15" />
+        <span>Atualizar</span>
       </button>
     </div>
 

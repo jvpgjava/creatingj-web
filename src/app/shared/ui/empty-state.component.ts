@@ -6,13 +6,15 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   template: `
     <div class="empty-state">
       @if (showMascot()) {
-        <img
-          src="assets/creatingj-mascot.png"
-          alt="Mascote CreatingJ"
-          class="mascot"
-          width="112"
-          height="112"
-        />
+        <div class="mascot-aura">
+          <img
+            src="assets/creatingj-mascot.png"
+            alt="Mascote CreatingJ"
+            class="mascot"
+            width="108"
+            height="108"
+          />
+        </div>
       }
       <h3>{{ title() }}</h3>
       <p class="cj-muted">{{ description() }}</p>
@@ -26,28 +28,42 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 2.5rem 1.5rem;
-      border: 1px dashed var(--cj-border);
+      padding: 3rem 1.5rem;
+      border: 1px solid var(--cj-border);
       border-radius: var(--cj-radius);
-      background: var(--cj-surface);
+      background:
+        radial-gradient(circle at 50% 25%, rgba(14, 165, 233, 0.09), transparent 55%),
+        var(--cj-surface);
+      box-shadow: var(--cj-shadow);
       gap: 0.5rem;
+    }
+
+    .mascot-aura {
+      width: 124px;
+      height: 124px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.16), transparent 72%);
+      margin-bottom: 0.35rem;
     }
 
     .mascot {
       object-fit: contain;
-      filter: drop-shadow(0 8px 18px rgba(56, 189, 248, 0.25));
-      margin-bottom: 0.4rem;
+      filter: drop-shadow(0 12px 22px rgba(14, 165, 233, 0.3));
     }
 
     h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
     }
 
     p {
-      margin: 0 0 0.5rem;
-      max-width: 460px;
-      font-size: 0.92rem;
+      margin: 0 0 0.4rem;
+      max-width: 440px;
+      font-size: 0.9rem;
     }
   `,
 })

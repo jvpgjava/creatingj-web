@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { IconComponent, IconName } from '../../shared/ui/icon.component';
 import { AuthStore } from '../auth/auth.store';
 import { NetworkStatusService } from './network-status.service';
 import { ThemeService } from './theme.service';
@@ -7,13 +8,13 @@ import { ThemeService } from './theme.service';
 interface NavItem {
   readonly label: string;
   readonly path: string;
-  readonly icon: string;
+  readonly icon: IconName;
 }
 
 @Component({
   selector: 'app-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent],
   template: `
     <div class="shell" [class.drawer-open]="drawerOpen()">
       @if (drawerOpen()) {
@@ -27,16 +28,18 @@ interface NavItem {
 
       <aside class="sidebar" aria-label="Navegação principal">
         <div class="brand">
-          <img
-            src="assets/creatingj-mascot.png"
-            alt="Mascote CreatingJ"
-            width="42"
-            height="42"
-            class="brand-logo"
-          />
+          <div class="brand-badge">
+            <img
+              src="assets/creatingj-mascot.png"
+              alt="Mascote CreatingJ"
+              width="34"
+              height="34"
+              class="brand-logo"
+            />
+          </div>
           <div class="brand-copy">
             <span class="brand-name">CreatingJ</span>
-            <span class="brand-tagline">Sem limites para imaginar</span>
+            <span class="brand-tagline">Workspace de IA</span>
           </div>
           <button
             type="button"
@@ -44,7 +47,7 @@ interface NavItem {
             (click)="closeDrawer()"
             aria-label="Fechar menu"
           >
-            ✕
+            <app-icon name="close" [size]="18" />
           </button>
         </div>
 
@@ -58,7 +61,7 @@ interface NavItem {
                 routerLinkActive="active"
                 (click)="closeDrawer()"
               >
-                <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+                <app-icon [name]="item.icon" [size]="17" />
                 <span>{{ item.label }}</span>
               </a>
             }
@@ -74,7 +77,7 @@ interface NavItem {
                   routerLinkActive="active"
                   (click)="closeDrawer()"
                 >
-                  <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+                  <app-icon [name]="item.icon" [size]="17" />
                   <span>{{ item.label }}</span>
                 </a>
               }
@@ -89,7 +92,7 @@ interface NavItem {
               routerLinkActive="active"
               (click)="closeDrawer()"
             >
-              <span class="nav-icon" aria-hidden="true">⚙</span>
+              <app-icon name="settings" [size]="17" />
               <span>Perfil e Sessões</span>
             </a>
           </div>
@@ -97,17 +100,27 @@ interface NavItem {
 
         <div class="sidebar-footer">
           @if (auth.user(); as user) {
-            <div class="user-chip">
-              <div class="user-name">{{ user.displayName || user.email }}</div>
-              <div class="user-email cj-muted">{{ user.email }}</div>
+            <div class="user-card">
+              <div class="avatar" aria-hidden="true">{{ userInitials() }}</div>
+              <div class="user-chip">
+                <div class="user-name">{{ user.displayName || user.email }}</div>
+                <div class="user-email cj-muted">{{ user.email }}</div>
+              </div>
             </div>
           }
           <div class="footer-actions">
-            <button type="button" class="cj-btn btn-compact" (click)="theme.toggle()">
-              {{ theme.mode() === 'dark' ? '☀ Claro' : '☾ Escuro' }}
+            <button
+              type="button"
+              class="cj-btn btn-compact"
+              (click)="theme.toggle()"
+              [attr.aria-label]="theme.mode() === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'"
+            >
+              <app-icon [name]="theme.mode() === 'dark' ? 'sun' : 'moon'" [size]="15" />
+              <span>{{ theme.mode() === 'dark' ? 'Claro' : 'Escuro' }}</span>
             </button>
             <button type="button" class="cj-btn cj-btn-danger btn-compact" (click)="logout()">
-              Sair
+              <app-icon name="logout" [size]="15" />
+              <span>Sair</span>
             </button>
           </div>
         </div>
@@ -122,18 +135,25 @@ interface NavItem {
             [attr.aria-expanded]="drawerOpen()"
             aria-label="Abrir menu de navegação"
           >
-            ☰
+            <app-icon name="menu" [size]="18" />
           </button>
 
           <div class="topbar-brand mobile-only">
-            <img src="assets/creatingj-mascot.png" alt="" width="28" height="28" />
+            <img src="assets/creatingj-mascot.png" alt="" width="26" height="26" />
             <span>CreatingJ</span>
+          </div>
+
+          <div class="topbar-tagline desktop-only">
+            Não existe limite para sua imaginação.
           </div>
 
           <div class="topbar-spacer"></div>
 
           @if (auth.user(); as user) {
-            <span class="role-pill">{{ auth.isAdmin() ? 'ADMIN' : 'MEMBRO' }}</span>
+            <span class="role-pill">
+              <app-icon name="shield" [size]="12" />
+              <span>{{ auth.isAdmin() ? 'ADMIN' : 'MEMBRO' }}</span>
+            </span>
             <span class="topbar-email desktop-only cj-muted">{{ user.email }}</span>
           }
         </header>
@@ -152,9 +172,9 @@ interface NavItem {
   styles: `
     .shell {
       display: grid;
-      grid-template-columns: 264px minmax(0, 1fr);
+      grid-template-columns: 268px minmax(0, 1fr);
       min-height: 100dvh;
-      background: var(--cj-bg);
+      background: var(--cj-bg-glow), var(--cj-bg);
     }
 
     .sidebar {
@@ -165,23 +185,32 @@ interface NavItem {
       flex-direction: column;
       background: var(--cj-surface);
       border-right: 1px solid var(--cj-border);
-      padding: 1rem;
-      gap: 1rem;
+      padding: 1.1rem 0.9rem;
+      gap: 1.1rem;
       z-index: 40;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.7rem;
-      padding: 0.25rem 0.25rem 0.75rem;
+      gap: 0.75rem;
+      padding: 0.15rem 0.35rem 0.95rem;
       border-bottom: 1px solid var(--cj-border);
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, rgba(14, 165, 233, 0.18), rgba(37, 99, 235, 0.12));
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      flex-shrink: 0;
     }
 
     .brand-logo {
       object-fit: contain;
-      filter: drop-shadow(0 6px 14px rgba(56, 189, 248, 0.35));
-      flex-shrink: 0;
     }
 
     .brand-copy {
@@ -193,13 +222,15 @@ interface NavItem {
 
     .brand-name {
       font-weight: 800;
-      font-size: 1.08rem;
-      letter-spacing: -0.02em;
+      font-size: 1.05rem;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
     }
 
     .brand-tagline {
-      font-size: 0.74rem;
-      color: var(--cj-primary);
+      font-size: 0.75rem;
+      color: var(--cj-text-muted);
+      font-weight: 500;
     }
 
     .nav-groups {
@@ -207,77 +238,108 @@ interface NavItem {
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 1.15rem;
+      gap: 1.25rem;
     }
 
     .nav-group {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.2rem;
     }
 
     .nav-group-title {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       color: var(--cj-text-muted);
-      padding: 0 0.65rem 0.2rem;
+      padding: 0 0.7rem 0.3rem;
     }
 
     .nav-link {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 0.65rem;
-      min-height: 42px;
-      padding: 0.55rem 0.75rem;
-      border-radius: var(--cj-radius-sm);
-      color: var(--cj-text);
+      gap: 0.7rem;
+      min-height: 40px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      color: var(--cj-text-muted);
       font-weight: 500;
-      font-size: 0.92rem;
+      font-size: 0.89rem;
       text-decoration: none;
       transition: background 0.15s ease, color 0.15s ease;
     }
 
     .nav-link:hover {
       background: var(--cj-surface-hover);
+      color: var(--cj-text);
       text-decoration: none;
     }
 
     .nav-link.active {
-      background: rgba(56, 189, 248, 0.16);
+      background: linear-gradient(90deg, rgba(14, 165, 233, 0.16), rgba(37, 99, 235, 0.08));
       color: var(--cj-primary);
-      font-weight: 700;
+      font-weight: 600;
     }
 
-    .nav-icon {
-      width: 1.25rem;
-      text-align: center;
-      font-size: 1rem;
+    .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #0ea5e9, #2563eb);
     }
 
     .sidebar-footer {
       border-top: 1px solid var(--cj-border);
-      padding-top: 0.85rem;
+      padding-top: 0.9rem;
       display: flex;
       flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
       gap: 0.65rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 10px;
+      background: var(--cj-surface-elevated);
+      border: 1px solid var(--cj-border);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      flex-shrink: 0;
     }
 
     .user-chip {
       min-width: 0;
+      flex: 1;
     }
 
     .user-name {
       font-weight: 600;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .user-email {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -290,8 +352,8 @@ interface NavItem {
     }
 
     .btn-compact {
-      min-height: 38px;
-      padding: 0.4rem 0.6rem;
+      min-height: 36px;
+      padding: 0.35rem 0.6rem;
       font-size: 0.82rem;
     }
 
@@ -306,13 +368,20 @@ interface NavItem {
       position: sticky;
       top: 0;
       z-index: 20;
-      height: 58px;
+      height: 60px;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0 1.25rem;
-      background: var(--cj-surface);
+      padding: 0 1.5rem;
+      background: var(--cj-surface-glass);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--cj-border);
+    }
+
+    .topbar-tagline {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--cj-text-muted);
     }
 
     .topbar-brand {
@@ -320,7 +389,7 @@ interface NavItem {
       align-items: center;
       gap: 0.5rem;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 0.98rem;
     }
 
     .topbar-spacer {
@@ -328,22 +397,27 @@ interface NavItem {
     }
 
     .role-pill {
-      font-size: 0.72rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      padding: 0.2rem 0.55rem;
+      letter-spacing: 0.04em;
+      padding: 0.25rem 0.6rem;
       border-radius: 999px;
-      background: rgba(56, 189, 248, 0.16);
+      background: rgba(14, 165, 233, 0.12);
       color: var(--cj-primary);
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      border: 1px solid rgba(14, 165, 233, 0.3);
     }
 
     .topbar-email {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
+      font-weight: 500;
     }
 
     .content {
       flex: 1;
-      padding: 1.5rem;
+      padding: 1.75rem;
       max-width: 1360px;
       width: 100%;
       margin: 0 auto;
@@ -353,10 +427,10 @@ interface NavItem {
       margin-bottom: 1rem;
       padding: 0.75rem 1rem;
       border-radius: var(--cj-radius-sm);
-      border: 1px solid rgba(245, 158, 11, 0.55);
-      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.12);
       color: var(--cj-warning);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
     }
 
@@ -364,13 +438,12 @@ interface NavItem {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: var(--cj-radius-sm);
-      border: 1px solid var(--cj-border);
-      background: var(--cj-surface-elevated);
+      border: 1px solid var(--cj-border-strong);
+      background: var(--cj-surface);
       color: var(--cj-text);
-      font-size: 1.15rem;
       cursor: pointer;
     }
 
@@ -398,7 +471,7 @@ interface NavItem {
       .sidebar {
         position: fixed;
         inset: 0 auto 0 0;
-        width: min(290px, 84vw);
+        width: min(296px, 85vw);
         transform: translateX(-105%);
         transition: transform 0.2s ease;
         box-shadow: var(--cj-shadow);
@@ -419,11 +492,11 @@ interface NavItem {
       }
 
       .topbar {
-        padding: 0 0.85rem;
+        padding: 0 0.9rem;
       }
 
       .content {
-        padding: 1rem 0.85rem;
+        padding: 1.1rem 0.9rem;
       }
     }
   `,
@@ -434,17 +507,27 @@ export class AppShellComponent {
   protected readonly network = inject(NetworkStatusService);
   protected readonly drawerOpen = signal(false);
 
+  protected readonly userInitials = computed(() => {
+    const user = this.auth.user();
+    const source = (user?.displayName || user?.email || 'CJ').trim();
+    const parts = source.split(/[\s@._-]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return source.slice(0, 2).toUpperCase();
+  });
+
   protected readonly memberItems: readonly NavItem[] = [
-    { label: 'Chat IA', path: '/app/chat', icon: '✦' },
-    { label: 'Projetos e RAG', path: '/app/projects', icon: '◫' },
-    { label: 'Tarefas Remotas', path: '/app/tasks', icon: '⚡' },
-    { label: 'Dispositivos', path: '/app/devices', icon: '⌘' },
-    { label: 'Meu Consumo', path: '/app/usage', icon: '◔' },
+    { label: 'Chat IA', path: '/app/chat', icon: 'chat' },
+    { label: 'Projetos e RAG', path: '/app/projects', icon: 'projects' },
+    { label: 'Tarefas Remotas', path: '/app/tasks', icon: 'tasks' },
+    { label: 'Dispositivos', path: '/app/devices', icon: 'devices' },
+    { label: 'Meu Consumo', path: '/app/usage', icon: 'usage' },
   ];
 
   protected readonly adminItems: readonly NavItem[] = [
-    { label: 'Usuários', path: '/admin/users', icon: '☺' },
-    { label: 'Consumo Global', path: '/admin/usage', icon: '▦' },
+    { label: 'Usuários', path: '/admin/users', icon: 'users' },
+    { label: 'Consumo Global', path: '/admin/usage', icon: 'analytics' },
   ];
 
   toggleDrawer(): void {

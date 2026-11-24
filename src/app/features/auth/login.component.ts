@@ -4,16 +4,18 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore, sanitizeInternalReturnUrl } from '../../core/auth/auth.store';
 import { normalizeApiError } from '../../core/errors/problem-detail';
 import { ThemeService } from '../../core/layout/theme.service';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-login',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   template: `
     <main class="auth-page">
       <div class="top-action">
         <button type="button" class="cj-btn" (click)="theme.toggle()">
-          {{ theme.mode() === 'dark' ? '☀ Tema claro' : '☾ Tema escuro' }}
+          <app-icon [name]="theme.mode() === 'dark' ? 'sun' : 'moon'" [size]="15" />
+          <span>{{ theme.mode() === 'dark' ? 'Tema claro' : 'Tema escuro' }}</span>
         </button>
       </div>
 
