@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
+import { NetworkStatusService } from './network-status.service';
 import { ThemeService } from './theme.service';
 
 interface NavItem {
@@ -138,6 +139,11 @@ interface NavItem {
         </header>
 
         <main class="content">
+          @if (!network.online()) {
+            <div class="offline-banner" role="alert">
+              Você está sem conexão com a internet. Algumas ações aguardam reconexão com o servidor.
+            </div>
+          }
           <router-outlet />
         </main>
       </div>
@@ -343,6 +349,17 @@ interface NavItem {
       margin: 0 auto;
     }
 
+    .offline-banner {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--cj-radius-sm);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      background: rgba(245, 158, 11, 0.14);
+      color: var(--cj-warning);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
     .icon-btn {
       display: inline-flex;
       align-items: center;
@@ -414,6 +431,7 @@ interface NavItem {
 export class AppShellComponent {
   protected readonly auth = inject(AuthStore);
   protected readonly theme = inject(ThemeService);
+  protected readonly network = inject(NetworkStatusService);
   protected readonly drawerOpen = signal(false);
 
   protected readonly memberItems: readonly NavItem[] = [
