@@ -1,7 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthStore } from '../auth/auth.store';
 import { NotificationService } from '../errors/notification.service';
 import { normalizeApiError } from '../errors/problem-detail';
 
@@ -43,11 +45,20 @@ export const apiCredentialsInterceptor: HttpInterceptorFn = (req, next) => {
 
 export const problemDetailInterceptor: HttpInterceptorFn = (req, next) => {
   const notifications = inject(NotificationService);
+  const auth = inject(AuthStore);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((err: unknown) => {
       const normalized = normalizeApiError(err);
-      if (normalized.status === 429) {
+      const isAuthBootstrapOrLogin =
+        req.url.includes('/auth/me') ||
+        req.url.includes('/auth/web/login') ||
+        req.url.includes('/auth/logout');
+
+      if (normalized.status === 401 && !isAuthBootstrapOrLogin) {
+        auth.handleSessionExpired(router.url);
+      } else if (normalized.status === 429) {
         notifications.warning(normalized.message);
       } else if (normalized.status >= 500 || normalized.status === 0) {
         notifications.error(normalized.message);
