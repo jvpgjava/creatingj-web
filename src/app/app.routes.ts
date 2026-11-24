@@ -43,13 +43,7 @@ export const routes: Routes = [
       {
         path: 'app/projects',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Projetos e Base RAG',
-          description: 'Gestão de projetos e conhecimento vetorial será entregue na Fase F4.',
-        },
+          import('./features/projects/projects.component').then((m) => m.ProjectsComponent),
       },
       {
         path: 'app/tasks',
