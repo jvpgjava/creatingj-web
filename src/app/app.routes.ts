@@ -38,13 +38,7 @@ export const routes: Routes = [
       {
         path: 'app/chat',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Chat IA',
-          description: 'Módulo de conversas com streaming SSE será entregue na Fase F3.',
-        },
+          import('./features/conversations/chat.component').then((m) => m.ChatComponent),
       },
       {
         path: 'app/projects',
