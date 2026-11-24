@@ -58,13 +58,7 @@ export const routes: Routes = [
       {
         path: 'app/usage',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Meu Consumo',
-          description: 'Quotas e histórico de consumo serão entregues na Fase F6.',
-        },
+          import('./features/usage/my-usage.component').then((m) => m.MyUsageComponent),
       },
       {
         path: 'admin/users',
@@ -78,24 +72,14 @@ export const routes: Routes = [
         path: 'admin/usage',
         canActivate: [adminGuard],
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Consumo Global',
-          description: 'Visão administrativa de quotas e uso será entregue na Fase F6.',
-        },
+          import('./features/usage/admin-usage.component').then((m) => m.AdminUsageComponent),
       },
       {
         path: 'settings',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
+          import('./features/account/account-settings.component').then(
+            (m) => m.AccountSettingsComponent,
           ),
-        data: {
-          title: 'Perfil e Sessões',
-          description: 'Gestão de sessões ativas e conta será entregue na Fase F6.',
-        },
       },
     ],
   },
