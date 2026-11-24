@@ -48,24 +48,12 @@ export const routes: Routes = [
       {
         path: 'app/tasks',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Tarefas Remotas',
-          description: 'Timeline SSE, diffs e aprovações remotas serão entregues na Fase F5.',
-        },
+          import('./features/tasks/tasks.component').then((m) => m.TasksComponent),
       },
       {
         path: 'app/devices',
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
-        data: {
-          title: 'Dispositivos',
-          description: 'Pareamento e presença do creatingj-runner serão entregues na Fase F5.',
-        },
+          import('./features/devices/devices.component').then((m) => m.DevicesComponent),
       },
       {
         path: 'app/usage',
