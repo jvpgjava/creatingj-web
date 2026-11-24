@@ -94,13 +94,9 @@ export const routes: Routes = [
         path: 'admin/users',
         canActivate: [adminGuard],
         loadComponent: () =>
-          import('./features/status/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
+          import('./features/admin-users/admin-users.component').then(
+            (m) => m.AdminUsersComponent,
           ),
-        data: {
-          title: 'Administração de Usuários',
-          description: 'Gestão de contas, convites e suspensão será entregue na Fase F2.',
-        },
       },
       {
         path: 'admin/usage',
